@@ -2,6 +2,7 @@ on: [push]
 
 jobs:
   test:
+    id: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -9,3 +10,13 @@ jobs:
       - run: docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache || true
       - run: docker build . -t img --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache
       - run: docker tag img docker.pkg.github.com/$GITHUB_REPOSITORY/build-cach && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache || true
+
+
+  run:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache
+      - run: docker run  docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache conda --list
+
