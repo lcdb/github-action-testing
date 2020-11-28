@@ -4,8 +4,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout
-      uses: actions/checkout@v2
-    - name: docker run
-      uses: ./
-
+      - uses: action/checkout@v2
+      - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
+      - run: docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache || true
+      - run: docker build . -t img --cache-from=docker.pkg.github.com/$GITHUB_REPOSIROTY/build-cache
+      - run: docker tag img docker.pkg.github.com/$GITHUB_REPOSITORY/build-cach && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache || true
