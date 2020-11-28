@@ -20,36 +20,37 @@ jobs:
       - run: docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache
       - run: docker run  docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache conda env list
 
-
-  - name: load conda env
-    runs-on: ubuntu-latest
-    id: cache-env
-    uses: actions/cache@v2
-    with:
-      path: /tmp/env.tar.gz
-      key: ${{ hashFiles('requirements-non-r.txt') }}-v1
-
-
-  - name: build conda env
-    runs-on: ubuntu-latest
-    if: steps.cache-env.outputs.cache-hit != 'true'
-    steps:
-      - run: |
-        conda config --add channels defaults
-        conda config --add channels bioconda
-        conda config --add channels conda-forge
-        conda install conda-pack
-      - run: conda create -p ./env --file requirements-non-r.txt -y
-      - run: conda pack -p ./env -o /tmp/env.tar.gz
-
-
-  conda-unpack:
+  conda:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: mkdir -p ./env && ( cd ./env && tar -xf /tmp/env.tar.gz . )
-      - run: ./env/bin/conda-unpack
-      - run: |
-        eval "$(conda shell.bash hook)"
-        source activate ./env
-        snakemake -h
+
+      - name: load conda env
+        id: cache-env
+        uses: actions/cache@v2
+        with:
+          path: /tmp/env.tar.gz
+          key: ${{ hashFiles('requirements-non-r.txt') }}-v1
+
+
+      - name: build conda env
+        if: steps.cache-env.outputs.cache-hit != 'true'
+        steps:
+          - run: |
+            conda config --add channels defaults
+            conda config --add channels bioconda
+            conda config --add channels conda-forge
+            conda install conda-pack
+          - run: conda create -p ./env --file requirements-non-r.txt -y
+          - run: conda pack -p ./env -o /tmp/env.tar.gz
+
+
+      conda-unpack:
+        steps:
+          - uses: actions/checkout@v2
+          - run: mkdir -p ./env && ( cd ./env && tar -xf /tmp/env.tar.gz . )
+          - run: ./env/bin/conda-unpack
+          - run: |
+            eval "$(conda shell.bash hook)"
+            source activate ./env
+            snakemake -h
