@@ -34,18 +34,17 @@ jobs:
 
 
       - name: build conda env
-        - if: steps.cache-env.outputs.cache-hit != 'true'
-        - run: |
+        if: steps.cache-env.outputs.cache-hit != 'true'
+        run: |
           conda config --add channels defaults
           conda config --add channels bioconda
           conda config --add channels conda-forge
           conda install conda-pack
-        - run: conda create -p ./env --file requirements-non-r.txt -y
-        - run: conda pack -p ./env -o /tmp/env.tar.gz
+          conda create -p ./env --file requirements-non-r.txt -y
+          conda pack -p ./env -o /tmp/env.tar.gz
 
 
       conda-unpack:
-        - uses: actions/checkout@v2
         - run: mkdir -p ./env && ( cd ./env && tar -xf /tmp/env.tar.gz . )
         - run: ./env/bin/conda-unpack
         - run: |
