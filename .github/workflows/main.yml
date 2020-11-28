@@ -44,7 +44,7 @@ jobs:
           conda pack -p ./env -o /tmp/env.tar.gz
 
 
-      conda-unpack:
+      - name: conda-unpack:
         run: |
           mkdir -p ./env && ( cd ./env && tar -xf /tmp/env.tar.gz . )
           ./env/bin/conda-unpack
