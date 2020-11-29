@@ -1,11 +1,15 @@
+This repo is a testing ground for GitHub Actions to evaluate it in comparison
+to the CircleCI setup we're currently using for lcdb-wf.
+
 Notes on testing:
 
 - building the envs is a constant ~8mins per env (env and env-r)
+
 - github cache has a 5 GB limit across all files in the cache. The environments
-  as-is are too big (3.8 GB and 4.8 GB for non-r and r respectively)
-- pulling 800 MB tarball from cache, extracting that into a 3.8 GB env dir and
-  running conda-unpack takes about a minute (circle-ci, which skips the
-  conda-pack, is 2 mins to restore the entire conda env from cache)
+  as-is are too big (3.8 GB and 4.8 GB for non-r and r respectively). So the
+  workaround here is to run conda-pack and cache *that* instead of the full env
+  directories.
+
 - docker takes 3m30s to pull an image no matter what
 
 - once envs are created (both packed and in docker containers), the timings are
