@@ -24,3 +24,5 @@ Notes on testing:
 
 - artifacts from each build then become the conda env tarball(s) and a Docker
   image containing them.
+
+- Docker image is available from https://github.com/lcdb/github-action-testing/packages/
