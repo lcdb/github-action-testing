@@ -51,3 +51,4 @@ jobs:
           eval "$(conda shell.bash hook)"
           source activate ./env
           snakemake -h
+          cutadapt -h
