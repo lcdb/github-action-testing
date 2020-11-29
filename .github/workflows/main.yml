@@ -32,6 +32,12 @@ jobs:
           path: /tmp/env.tar.gz
           key: ${{ hashFiles('requirements-non-r.txt') }}-v1
 
+      - name: load conda env-r
+        id: cache-env-r
+        uses: actions/cache@v2
+        with:
+          path: /tmp/env-r.tar.gz
+          key: ${{ hashFiles('requirements-r.txt') }}-v1
 
       - name: build conda env
         if: steps.cache-env.outputs.cache-hit != 'true'
@@ -43,12 +49,22 @@ jobs:
           conda create -p ./env --file requirements-non-r.txt -y
           conda pack -p ./env -o /tmp/env.tar.gz
 
+      - name: build conda env-r
+        if: steps.cache-env-r.outputs.cache-hit != 'true'
+        run: |
+          conda config --add channels defaults
+          conda config --add channels bioconda
+          conda config --add channels conda-forge
+          conda install conda-pack
+          conda create -p ./env --file requirements-r.txt -y
+          conda pack -p ./env-r -o /tmp/env-r.tar.gz
 
       - name: conda-unpack
         run: |
           mkdir -p ./env && ( cd ./env && tar -xf /tmp/env.tar.gz )
+          mkdir -p ./env-r && ( cd ./env-r && tar -xf /tmp/env-r.tar.gz )
           ./env/bin/conda-unpack
+          ./env-r/bin/conda-unpack
           eval "$(conda shell.bash hook)"
           source activate ./env
-          snakemake -h
           cutadapt -h
