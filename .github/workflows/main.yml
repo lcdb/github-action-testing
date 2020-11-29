@@ -1,5 +1,4 @@
 on: [push]
-
 jobs:
   docker-build-and-push:
     runs-on: ubuntu-latest
